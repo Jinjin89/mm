@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.venv/
+venv/
+*.log
+
+# Node
+node_modules/
+.npm/
+.next/
+.out/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Expo/React Native
+.expo/
+.expo-shared/
+web-build/
+android/
+ios/
+
+# Docker
+*.pid
+*.sock
+
+# Misc
+.DS_Store
+.idea/
+.vscode/
+*.swp

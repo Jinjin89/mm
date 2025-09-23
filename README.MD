@@ -131,3 +131,49 @@
 - 🔴 **高优先级**：M1 + M2 基础功能（闭环跑通必须）。  
 - 🟡 **中优先级**：M3、M4（增强体验，进入内测）。  
 - 🟢 **低优先级**：M5 及后续演进（长期优化）。  
+
+---
+
+## 快速开始（开发环境）
+
+本仓库已经按照任务 1.1 的要求，提供了一套基于 Docker Compose 的本地化开发环境：
+
+1. **准备环境**
+   - 安装 Docker 与 Docker Compose v2。
+   - 将 `.env.example` 复制为 `.env`，并根据实际情况填写密钥或域名。
+
+2. **启动所有服务**
+   ```bash
+   make up
+   ```
+   该命令会按需构建镜像并启动以下容器：Postgres、Redis、MinIO、Django、Celery Worker、Next.js Web、Expo Web（React Native Dev Server）。
+
+3. **服务访问入口**
+   - Django API：http://localhost:8000/api/health/
+   - Web 前端（Next.js）：http://localhost:3000
+   - React Native Web 端（Expo Dev Server）：http://localhost:19006
+   - MinIO 控制台：http://localhost:9001 （默认账号密码 `music` / `musicsecret`）
+
+4. **运行后端测试**
+   ```bash
+   make tests
+   ```
+   如果当前环境无法使用 Docker，可以先安装依赖后在本地使用 SQLite 运行测试：
+   ```bash
+   pip install -r backend/requirements.txt
+   USE_SQLITE_FOR_TESTS=1 python backend/manage.py test
+   ```
+
+5. **关闭环境**
+   ```bash
+   make down
+   ```
+
+如需进入容器执行命令，可使用 `make backend-shell` 或 `make celery-shell`。后续迭代可在现有目录结构下扩展各模块功能，逐步完成 README 中的全部里程碑。
+
+---
+
+## 文档与资源
+
+- [docs/USAGE.md](docs/USAGE.md)：提供详细的环境配置、启动、测试与前端开发说明。
+- `mobile/assets/README.md`：说明如何在不提交二进制文件的前提下自定义 Expo 图标与启动页，避免 PR 校验的「Binary files are not supported」提示。
