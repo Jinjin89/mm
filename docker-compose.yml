@@ -1,0 +1,110 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: music
+      POSTGRES_PASSWORD: music
+      POSTGRES_DB: music_platform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:RELEASE.2023-08-16T20-17-30Z
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: music
+      MINIO_ROOT_PASSWORD: musicsecret
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  django:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    environment:
+      DJANGO_SETTINGS_MODULE: music_platform.settings
+      SECRET_KEY: ${secret_key:-replace-this-secret-key}
+      POSTGRES_DB: ${db_name:-music_platform}
+      POSTGRES_USER: ${db_user:-music}
+      POSTGRES_PASSWORD: ${db_password:-music}
+      POSTGRES_HOST: ${db_host:-postgres}
+      POSTGRES_PORT: 5432
+      REDIS_URL: ${redis_url:-redis://redis:6379/0}
+      MINIO_ENDPOINT: ${minio_endpoint:-minio:9000}
+      MINIO_ACCESS_KEY: ${minio_access_key:-music}
+      MINIO_SECRET_KEY: ${minio_secret_key:-musicsecret}
+      MINIO_BUCKET_NAME: ${minio_bucket:-media}
+      NEXT_PUBLIC_API_URL: ${next_public_api_url:-http://localhost:8000}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+
+  celery:
+    build:
+      context: ./backend
+    depends_on:
+      - django
+      - redis
+    environment:
+      DJANGO_SETTINGS_MODULE: music_platform.settings
+      SECRET_KEY: ${secret_key:-replace-this-secret-key}
+      POSTGRES_DB: ${db_name:-music_platform}
+      POSTGRES_USER: ${db_user:-music}
+      POSTGRES_PASSWORD: ${db_password:-music}
+      POSTGRES_HOST: ${db_host:-postgres}
+      POSTGRES_PORT: 5432
+      REDIS_URL: ${redis_url:-redis://redis:6379/0}
+      MINIO_ENDPOINT: ${minio_endpoint:-minio:9000}
+      MINIO_ACCESS_KEY: ${minio_access_key:-music}
+      MINIO_SECRET_KEY: ${minio_secret_key:-musicsecret}
+      MINIO_BUCKET_NAME: ${minio_bucket:-media}
+    command: celery -A music_platform worker -l info
+    volumes:
+      - ./backend:/app
+
+  web:
+    build:
+      context: ./web
+    depends_on:
+      - django
+    environment:
+      NEXT_PUBLIC_API_URL: ${next_public_api_url:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/app
+
+  mobile:
+    build:
+      context: ./mobile
+    depends_on:
+      - django
+    environment:
+      EXPO_PUBLIC_API_URL: ${expo_public_api_url:-http://10.0.2.2:8000}
+    ports:
+      - "19006:19006"
+    volumes:
+      - ./mobile:/app
+
+volumes:
+  postgres_data:
+  minio_data:
