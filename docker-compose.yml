@@ -90,6 +90,7 @@ services:
       - "3000:3000"
     volumes:
       - ./web:/app
+      - /app/node_modules
 
   mobile:
     build:
@@ -102,6 +103,7 @@ services:
       - "19006:19006"
     volumes:
       - ./mobile:/app
+      - /app/node_modules
 
 volumes:
   postgres_data:
