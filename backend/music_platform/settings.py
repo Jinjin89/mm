@@ -1,6 +1,7 @@
 """Django settings for the music platform project."""
 from __future__ import annotations
 
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "core",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -100,13 +102,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
+        "users.authentication.SignedTokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
+
+AUTH_USER_MODEL = "users.User"
+
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
+REFRESH_TOKEN_LIFETIME = timedelta(days=7)
+AUTH_HEADER_TYPE = "Bearer"
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
