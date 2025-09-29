@@ -80,6 +80,20 @@ A convenient Make target wraps the Django test command (runs within Docker when 
 make tests
 ```
 
+## API Authentication Primer
+
+The backend now exposes a minimal JWT-like authentication system built on Django's signing utilities. Use the following REST en
+dpoints to obtain and refresh tokens:
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/api/auth/register/` | `POST` | Create a new account using an email address or phone number, plus a password. |
+| `/api/auth/login/` | `POST` | Exchange email/phone credentials for an access/refresh token pair. |
+| `/api/auth/refresh/` | `POST` | Rotate a refresh token and receive a new token pair. |
+
+Tokens are returned in the response body under the `tokens` key. Include the access token in the `Authorization` header using th
+e `Bearer <token>` format when calling protected endpoints.
+
 ## Frontend Development Notes
 
 ### Next.js Web

@@ -10,4 +10,5 @@ urlpatterns = [
     path("", ServiceOverviewView.as_view(), name="service-overview"),
     path("admin/", admin.site.urls),
     path("api/", include("core.urls")),
+    path("api/auth/", include("users.urls")),
 ]
