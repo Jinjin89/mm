@@ -16,6 +16,7 @@ DEBUG = os.environ.get("DEBUG", "1") == "1"
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get("allowed_hosts", "*").split(",") if host.strip()]
 
 INSTALLED_APPS = [
+    "users.apps.UsersConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -25,7 +26,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "core",
-    "users",
 ]
 
 MIDDLEWARE = [
